@@ -1,3 +1,6 @@
+/* eslint-disable space-in-parens */
+/* eslint-disable operator-linebreak */
+/* eslint-disable comma-dangle */
 /* eslint-disable max-len */
 import AddFunctions from './AddFunctions';
 import cursors from './cursors';
@@ -37,7 +40,11 @@ export default class GameController {
   }
 
   startGame() {
-    AddFunctions.statsUpdate(this.level, this.points, this.gameState.bestPoints);
+    AddFunctions.statsUpdate(
+      this.level,
+      this.points,
+      this.gameState.bestPoints
+    );
     this.userTeam.playerStartTeam();
     this.compTeam.compStartTeam();
     this.setCharactersArr();
@@ -70,18 +77,28 @@ export default class GameController {
     this.gamePlay.drawUi(themes[this.setTheme()]);
     this.userTeam.loadGameTeam(loadClass.gameData.userTeam.characters);
     this.compTeam.loadGameTeam(loadClass.gameData.compTeam.characters);
-    const ghostCharacters = [...this.userTeam.characters, ...this.compTeam.characters];
+    const ghostCharacters = [
+      ...this.userTeam.characters,
+      ...this.compTeam.characters,
+    ];
 
     ghostCharacters.forEach((item, index) => {
       this.characters.push(
-        new PositionedCharacter(item, loadClass.gameData.characters[index].position),
+        new PositionedCharacter(
+          item,
+          loadClass.gameData.characters[index].position
+        )
       );
     });
 
     this.clearCellListeners();
     this.addCellListeners();
     this.gamePlay.redrawPositions(this.characters);
-    AddFunctions.statsUpdate(this.level, this.points, this.gameState.bestPoints);
+    AddFunctions.statsUpdate(
+      this.level,
+      this.points,
+      this.gameState.bestPoints
+    );
     GamePlay.showError('The game is loaded');
   }
 
@@ -111,18 +128,20 @@ export default class GameController {
           return;
         }
 
-        GamePlay.showError('This is the opponent\'s character!');
+        GamePlay.showError("This is the opponent's character!");
         return;
       }
 
       if (!this.activeCharacter) return;
       // Атака
-      const damage = +(Math.max(
-        this.activeCharacter.character.attack - characterInCell.character.defence,
-        this.activeCharacter.character.attack * 0.1,
-      )).toFixed(1);
+      const damage = +Math.max(
+        this.activeCharacter.character.attack -
+          characterInCell.character.defence,
+        this.activeCharacter.character.attack * 0.1
+      ).toFixed(1);
       characterInCell.character.health -= damage;
-      characterInCell.character.health = +(characterInCell.character.health).toFixed(1);
+      characterInCell.character.health =
+        +characterInCell.character.health.toFixed(1);
 
       this.gamePlay.deselectCell(this.activeCharacterIndex);
       this.gamePlay.deselectCell(index);
@@ -187,12 +206,19 @@ export default class GameController {
       }
 
       // Показываем информацию о персонаже
-      this.gamePlay.showCellTooltip(`\u{1F396} ${characterInCell.character.level} \u{2694} ${characterInCell.character.attack} \u{1F6E1} ${characterInCell.character.defence} \u{2764} ${characterInCell.character.health}`, index);
+      this.gamePlay.showCellTooltip(
+        `\u{1F396} ${characterInCell.character.level} \u{2694} ${characterInCell.character.attack} \u{1F6E1} ${characterInCell.character.defence} \u{2764} ${characterInCell.character.health}`,
+        index
+      );
     }
 
     // Доступные ячейки для перемещения, если выбран активный персонаж
     if (this.activeCharacter && !characterInCell) {
-      const range = distance(this.activeCharacter, this.activeCharacterIndex, 'move');
+      const range = distance(
+        this.activeCharacter,
+        this.activeCharacterIndex,
+        'move'
+      );
       range.forEach((item) => {
         if (item === index) {
           this.gamePlay.selectCell(index, 'green');
@@ -207,8 +233,16 @@ export default class GameController {
     }
 
     // Доступные ячейки для атаки, если выбран активный персонаж + недоступные действия
-    if (this.activeCharacter && characterInCell && !AddFunctions.isPlayableCharacter(characterInCell)) {
-      const range = distance(this.activeCharacter, this.activeCharacterIndex, 'attack');
+    if (
+      this.activeCharacter &&
+      characterInCell &&
+      !AddFunctions.isPlayableCharacter(characterInCell)
+    ) {
+      const range = distance(
+        this.activeCharacter,
+        this.activeCharacterIndex,
+        'attack'
+      );
 
       // Выделяем ячейку для атаки
       range.forEach((item) => {
@@ -220,7 +254,10 @@ export default class GameController {
       });
 
       // Недоступные действия, если выходим за рамки области атаки и курсор наведен на противника
-      if (!this.canAttack && !AddFunctions.isPlayableCharacter(characterInCell)) {
+      if (
+        !this.canAttack &&
+        !AddFunctions.isPlayableCharacter(characterInCell)
+      ) {
         this.gamePlay.setCursor(cursors.notallowed);
       }
     }
@@ -244,7 +281,11 @@ export default class GameController {
     }
 
     // Убираем подсветку доступной атаки
-    if (this.activeCharacter && characterInCell && !AddFunctions.isPlayableCharacter(characterInCell)) {
+    if (
+      this.activeCharacter &&
+      characterInCell &&
+      !AddFunctions.isPlayableCharacter(characterInCell)
+    ) {
       this.gamePlay.deselectCell(index);
       this.canAttack = null;
     }
@@ -259,7 +300,9 @@ export default class GameController {
     // Перебираем команду компа и выбираем цель для атаки, если такая есть
     this.compTeam.characters.find((compChar) => {
       // Ищем позицию персонажа компа, positionedCharacter на выходе
-      const posChar = this.characters.find((char) => char.character === compChar);
+      const posChar = this.characters.find(
+        (char) => char.character === compChar
+      );
 
       // Вычисляем доступную дистанцию для атаки
       const rangeAttack = distance(posChar, posChar.position, 'attack');
@@ -269,7 +312,10 @@ export default class GameController {
         const characterInCell = this.checkCharacterInCell(itemIndex);
 
         // Если есть и персонаж игрока - цель для атаки выбрана
-        if (characterInCell && AddFunctions.isPlayableCharacter(characterInCell)) {
+        if (
+          characterInCell &&
+          AddFunctions.isPlayableCharacter(characterInCell)
+        ) {
           willBeAttacked = characterInCell;
           return willBeAttacked;
         }
@@ -285,12 +331,14 @@ export default class GameController {
         // Подсвечиваем персонажа, которого атакуем
         this.gamePlay.selectCell(willBeAttacked.position, 'red');
 
-        const damage = +(Math.max(
-          activeCompCharacter.character.attack - willBeAttacked.character.defence,
-          activeCompCharacter.character.attack * 0.1,
-        )).toFixed(1);
+        const damage = +Math.max(
+          activeCompCharacter.character.attack -
+            willBeAttacked.character.defence,
+          activeCompCharacter.character.attack * 0.1
+        ).toFixed(1);
         willBeAttacked.character.health -= damage;
-        willBeAttacked.character.health = +(willBeAttacked.character.health).toFixed(1);
+        willBeAttacked.character.health =
+          +willBeAttacked.character.health.toFixed(1);
 
         (async () => {
           await this.gamePlay.showDamage(willBeAttacked.position, damage);
@@ -326,7 +374,11 @@ export default class GameController {
     // Команда компа - выбираем самого мощного по атаке
     activeCompCharacter = this.strongCharacter(this.compTeam.characters);
 
-    const rangeMove = distance(activeCompCharacter, activeCompCharacter.position, 'move');
+    const rangeMove = distance(
+      activeCompCharacter,
+      activeCompCharacter.position,
+      'move'
+    );
 
     // Проверяем, нет ли в ячейке другого персонажа, чтобы не занять его место
     rangeMove.forEach((item, index, array) => {
@@ -340,7 +392,9 @@ export default class GameController {
     const rangeAttackUser = new Set();
 
     this.userTeam.characters.find((userChar) => {
-      const posChar = this.characters.find((char) => char.character === userChar);
+      const posChar = this.characters.find(
+        (char) => char.character === userChar
+      );
 
       // Дистанция атаки активного компа с позиции противника
       const range = distance(activeCompCharacter, posChar.position, 'attack');
@@ -395,7 +449,7 @@ export default class GameController {
   gameLoop() {
     this.userTeam.characters.forEach((item) => {
       this.points += item.health;
-      this.points = +(this.points).toFixed(1);
+      this.points = +this.points.toFixed(1);
       this.gameState.saveBestPoints(this.points);
       this.updateBestPoints();
       AddFunctions.levelUp(item);
@@ -404,6 +458,7 @@ export default class GameController {
     GamePlay.showError(`You win! Points: ${this.points}`);
 
     this.level += 1;
+    this.turn = true;
     this.gamePlay.drawUi(themes[this.setTheme()]);
     this.userTeam.playerUpdateTeam(this.level, this.userTeam.characters.length);
     this.compTeam.compUpdateTeam(this.level, this.userTeam.characters.length);
@@ -412,7 +467,11 @@ export default class GameController {
     this.allowCompPositions = [];
     this.setCharactersArr();
     this.gamePlay.redrawPositions(this.characters);
-    AddFunctions.statsUpdate(this.level, this.points, this.gameState.bestPoints);
+    AddFunctions.statsUpdate(
+      this.level,
+      this.points,
+      this.gameState.bestPoints
+    );
 
     this.whoseTurn();
   }
@@ -467,9 +526,7 @@ export default class GameController {
       const newPosition = positions[randomPosition];
       positions.splice(randomPosition, 1); // Исключаем дубли при генерации
 
-      this.characters.push(
-        new PositionedCharacter(item, newPosition),
-      );
+      this.characters.push(new PositionedCharacter(item, newPosition));
     });
   }
 
@@ -485,7 +542,7 @@ export default class GameController {
 
   // Список возможных ячеек, в которых может появиться персонаж игрока
   getPlayerPositions() {
-    for (let i = 0; i < this.gamePlay.boardSize ** 2;) {
+    for (let i = 0; i < this.gamePlay.boardSize ** 2; ) {
       if (i % 2 === 0) {
         this.allowPlayerPositions.push(i);
         i += 1;
@@ -498,7 +555,7 @@ export default class GameController {
 
   // Список возможных ячеек, в которых может появиться персонаж компа
   getCompPositions() {
-    for (let i = 6; i < this.gamePlay.boardSize ** 2;) {
+    for (let i = 6; i < this.gamePlay.boardSize ** 2; ) {
       if (i % 2 === 0) {
         this.allowCompPositions.push(i);
         i += 1;
